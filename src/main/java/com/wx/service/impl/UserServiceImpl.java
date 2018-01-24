@@ -23,6 +23,8 @@ public class UserServiceImpl implements UserService {
 	
 	public void select() {
 		UserExample example = new UserExample();
+		
+		example.createCriteria().andUsernameLike("%"+"A"+"%");		
 		List<User> list = userDao.select(example);
 		for (User user : list) {
 			System.out.println(user.toString());
