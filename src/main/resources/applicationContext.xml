@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+
+	<!-- 引入数据库配置文件 -->
+	<context:property-placeholder location="classpath:db.properties" />
+
+	<!-- 配置数据库连接池 dbcp2 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+
+	<!-- mybatis工厂配置 -->
+	<bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 配置mapper.xml文件的路径 -->
+		<property name="mapperLocations" value="classpath:com/wx/mapper/*.xml" />
+		<!-- 配置数据源 -->
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 实例化的时候会自动找到上面生成的 sqlSessionFactory ，不需要手动显式的注入sqlSessionFactory -->
+		<!-- 扫描的基本包，会扫描基本包及其子包下的mapper接口 -->
+		<property name="basePackage" value="com.wx.mapper"></property>
+	</bean>
+	
+	<!-- 开启注解扫描 -->
+	<context:component-scan base-package="com.wx.service;com.wx.dao" />
+	
+	<!--开启事务注解 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<!-- 配置事务 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+</beans>
